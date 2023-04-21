@@ -2,36 +2,43 @@ from tkinter import *
 from tkinter import messagebox
 import string
 import random
+import json
 
 
 # --------------------------- ADD PASSWORD ---------------------------- #
 def append_password():
-    website = website_entry.get()
-    email = email_username_entry.get()
+    website = website_entry.get().title()
+    email = email_username_entry.get().lower()
     password = password_entry.get()
+    new_data = {
+        website: {
+            "email": email,
+            "password": password,
+        }
+    }
 
-    # Make a check
     if len(password_entry.get()) == 0 and len(website_entry.get()) == 0:
         messagebox.showerror(title="Error", message="Please do NOT leave any fields empty!")
     else:
-        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email} "
-                                                              f"\nPassword: {password} \nIs it ok to save?")
-        if is_ok:
-            with open("website_number.txt", mode="r") as website_n:
-                n = int(website_n.read())
-                n += 1
-            with open("passwords.txt", mode="a") as passwords_file:
-                passwords_file.write(f"{n}.Website: {website.title()}"
-                                     f"\nEmail/Username: {email.lower()}"
-                                     f"\nPassword: {password}\n")
-            with open("website_number.txt", mode="w") as data:
-                data.write(f"{n}")
-                website_entry.delete(0, END)
-                email_username_entry.delete(0, END)
-                password_entry.delete(0, END)
+        try:
+            is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email} "
+                                                                  f"\nPassword: {password} \nIs it ok to save?")
+            if is_ok:
+                with open("passwords.json", mode="r") as passwords_file:
+                    # Reading old data
+                    data = json.load(passwords_file)
+        except FileNotFoundError:
+            with open("passwords.json", mode="w") as passwords_file:
+                json.dump(new_data, passwords_file, indent=4)
         else:
+            # Updating old data with new data
+            data.update(new_data)
+
+            with open("passwords.json", mode="w") as passwords_file:
+                # Saving updated data
+                json.dump(data, passwords_file, indent=4)
+        finally:
             website_entry.delete(0, END)
-            email_username_entry.delete(0, END)
             password_entry.delete(0, END)
 
 
