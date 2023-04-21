@@ -5,6 +5,24 @@ import random
 import json
 
 
+# --------------------------- SEARCH DATA ---------------------------- #
+def search_data():
+    website = website_entry.get().title()
+    try:
+        with open("passwords.json") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showerror(title="Error", message="No Data File Found")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            new_message = f"Email: {email}\nPassword: {password}"
+            messagebox.showinfo(title=website, message=new_message)
+        else:
+            messagebox.showerror(title="Error", message=f"No details for {website} exists.")
+
+
 # --------------------------- ADD PASSWORD ---------------------------- #
 def append_password():
     website = website_entry.get().title()
@@ -73,8 +91,8 @@ password_label = Label(text="Password:", pady=10)
 password_label.grid(row=3, column=0)
 
 # Entries
-website_entry = Entry(width=50)
-website_entry.grid(row=1, column=1, columnspan=2)
+website_entry = Entry(width=32)
+website_entry.grid(row=1, column=1)
 
 email_username_entry = Entry(width=50)
 email_username_entry.grid(row=2, column=1, columnspan=2)
@@ -84,6 +102,9 @@ password_entry = Entry(width=32)
 password_entry.grid(row=3, column=1)
 
 # Buttons
+search_button = Button(text="Search", width=15, command=search_data)
+search_button.grid(row=1, column=2)
+
 gen_password_button = Button(text="Generate Password", command=generate_password)
 gen_password_button.grid(row=3, column=2)
 
