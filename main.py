@@ -1,19 +1,38 @@
 from tkinter import *
+from tkinter import messagebox
 import string
 import random
 
 
 # --------------------------- ADD PASSWORD ---------------------------- #
 def append_password():
-    with open("website_number.txt", mode="r") as website_n:
-        n = int(website_n.read())
-        n += 1
-    with open("passwords.txt", mode="a") as passwords_file:
-        passwords_file.write(f"{n}.Website: {website_entry.get().title()}"
-                             f"\nEmail/Username: {email_username_entry.get().lower()}"
-                             f"\nPassword: {password_entry.get()}\n")
-    with open("website_number.txt", mode="w") as data:
-        data.write(f"{n}")
+    website = website_entry.get()
+    email = email_username_entry.get()
+    password = password_entry.get()
+
+    # Make a check
+    if len(password_entry.get()) == 0 and len(website_entry.get()) == 0:
+        messagebox.showerror(title="Error", message="Please do NOT leave any fields empty!")
+    else:
+        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email} "
+                                                              f"\nPassword: {password} \nIs it ok to save?")
+        if is_ok:
+            with open("website_number.txt", mode="r") as website_n:
+                n = int(website_n.read())
+                n += 1
+            with open("passwords.txt", mode="a") as passwords_file:
+                passwords_file.write(f"{n}.Website: {website.title()}"
+                                     f"\nEmail/Username: {email.lower()}"
+                                     f"\nPassword: {password}\n")
+            with open("website_number.txt", mode="w") as data:
+                data.write(f"{n}")
+                website_entry.delete(0, END)
+                email_username_entry.delete(0, END)
+                password_entry.delete(0, END)
+        else:
+            website_entry.delete(0, END)
+            email_username_entry.delete(0, END)
+            password_entry.delete(0, END)
 
 
 # ------------------------ GENERATE PASSWORD -------------------------- #
@@ -52,6 +71,7 @@ website_entry.grid(row=1, column=1, columnspan=2)
 
 email_username_entry = Entry(width=50)
 email_username_entry.grid(row=2, column=1, columnspan=2)
+email_username_entry.insert(0, "example@gmail.com")
 
 password_entry = Entry(width=32)
 password_entry.grid(row=3, column=1)
